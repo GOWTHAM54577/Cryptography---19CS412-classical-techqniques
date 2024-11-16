@@ -1,15 +1,15 @@
-# Hill Cipher
-Hill Cipher using with different key values
+# Vigenere Cipher
+Vigenere Cipher using with different key values
 
 # AIM:
 
-To develop a simple C program to implement Hill Cipher.
+To develop a simple C program to implement Vigenere Cipher.
 
 ## DESIGN STEPS:
 
 ### Step 1:
 
-Design of Hill Cipher algorithnm 
+Design of Vigenere Cipher algorithnm 
 
 ### Step 2:
 
@@ -19,9 +19,8 @@ Implementation using C or pyhton code
 
 Testing algorithm with different key values. 
 ALGORITHM DESCRIPTION:
-The Hill cipher is a substitution cipher invented by Lester S. Hill in 1929. Each letter is represented by a number modulo 26. To encrypt a message, each block of n letters is multiplied by an invertible n × n matrix, again modulus 26.
-To decrypt the message, each block is multiplied by the inverse of the matrix used for encryption. The matrix used for encryption is the cipher key, and it should be chosen randomly from the set of invertible n × n matrices (modulo 26).
-The cipher can, be adapted to an alphabet with any number of letters. All arithmetic just needs to be done modulo the number of letters instead of modulo 26.
+The Vigenere cipher is a method of encrypting alphabetic text by using a series of different Caesar ciphers based on the letters of a keyword. It is a simple form of polyalphabetic substitution.To encrypt, a table of alphabets can be used, termed a Vigenere square, or Vigenere table. It consists of the alphabet written out 26 times in different rows, each alphabet shifted cyclically to the left compared to the previous alphabet, corresponding to the 26 possible Caesar ciphers. At different points in the encryption process, the cipher uses a different alphabet from one of the rows used. The alphabet at each point depends on a repeating keyword.
+
 
 
 ## PROGRAM:
@@ -30,105 +29,63 @@ Developed by : GOWTHAM N
 Register no  : 212223100008
 ```
 ```
-
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
 
-int keymat[3][3] = { { 1, 2, 1 }, { 2, 3, 2 }, { 2, 2, 1 } };
-int invkeymat[3][3] = { { -1, 0, 1 }, { 2, -1, 0 }, { -2, 2, -1 } };
-char key[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-// Modify encode and decode to return char* instead of char
-char* encode(char a, char b, char c) 
-{
-    char* ret = (char*)malloc(4); // dynamically allocate memory for ret
-    int x, y, z;
-    int posa = (int) a - 65;
-    int posb = (int) b - 65;
-    int posc = (int) c - 65;
-
-    x = posa * keymat[0][0] + posb * keymat[1][0] + posc * keymat[2][0];
-    y = posa * keymat[0][1] + posb * keymat[1][1] + posc * keymat[2][1];
-    z = posa * keymat[0][2] + posb * keymat[1][2] + posc * keymat[2][2];
-
-    ret[0] = key[x % 26];
-    ret[1] = key[y % 26];
-    ret[2] = key[z % 26];
-    ret[3] = '\0';
-    return ret;
-}
-char* decode(char a, char b, char c)
-{
-    char* ret = (char*)malloc(4); // dynamically allocate memory for ret
-    int x, y, z;
-    int posa = (int) a - 65;
-    int posb = (int) b - 65;
-    int posc = (int) c - 65;
-
-    x = posa * invkeymat[0][0] + posb * invkeymat[1][0] + posc * invkeymat[2][0];
-    y = posa * invkeymat[0][1] + posb * invkeymat[1][1] + posc * invkeymat[2][1];
-    z = posa * invkeymat[0][2] + posb * invkeymat[1][2] + posc * invkeymat[2][2];
-
-    // Fix negative modulo result
-    ret[0] = key[(x % 26 < 0) ? (26 + x % 26) : (x % 26)];
-    ret[1] = key[(y % 26 < 0) ? (26 + y % 26) : (y % 26)];
-    ret[2] = key[(z % 26 < 0) ? (26 + z % 26) : (z % 26)];
-    ret[3] = '\0';
-    return ret;
-}
-int main()
-{
-    char msg[1000];
-    char enc[1000] = "";
-    char dec[1000] = "";
-    int n;
-    strcpy(msg, "SecurityLaboratory");
-    printf("Simulation of Hill Cipher\n");
-    printf("Input message : %s\n", msg);
-    for (int i = 0; i < strlen(msg); i++)
-    {
-        msg[i] = toupper(msg[i]);
-    }
-    // Remove spaces and append padding if necessary
-    n = strlen(msg) % 3;
-    if (n != 0) {
-        for (int i = 1; i <= (3 - n); i++) {
-            strcat(msg, "X");
+// Function to perform Vigenère encryption
+void vigenereEncrypt(char *text, const char *key) {
+    int textLen = strlen(text);
+    int keyLen = strlen(key);
+    for (int i = 0; i < textLen; i++) {
+        char c = text[i];
+        if (c >= 'A' && c <= 'Z') {
+            // Encrypt uppercase letters
+            text[i] = ((c - 'A' + key[i % keyLen] - 'A') % 26) + 'A';
+        } else if (c >= 'a' && c <= 'z') {
+            // Encrypt lowercase letters
+            text[i] = ((c - 'a' + key[i % keyLen] - 'A') % 26) + 'a';
         }
     }
-    printf("Padded message : %s\n", msg);
-    for (int i = 0; i < strlen(msg); i += 3)
-    {
-        char a = msg[i];
-        char b = msg[i + 1];
-        char c = msg[i + 2];
-        // Append encoded result to enc
-        strcat(enc, encode(a, b, c));
+}
+// Function to perform Vigenère decryption
+void vigenereDecrypt(char *text, const char *key) {
+    int textLen = strlen(text);
+    int keyLen = strlen(key);
+    for (int i = 0; i < textLen; i++) {
+        char c = text[i];
+        if (c >= 'A' && c <= 'Z') {
+            // Decrypt uppercase letters
+            text[i] = ((c - 'A' - (key[i % keyLen] - 'A') + 26) % 26) + 'A';
+        } else if (c >= 'a' && c <= 'z') {
+            // Decrypt lowercase letters
+            text[i] = ((c - 'a' - (key[i % keyLen] - 'A') + 26) % 26) + 'a';
+        }
     }
-    printf("Encoded message : %s\n", enc);
-    for (int i = 0; i < strlen(enc); i += 3)
-    {
-        char a = enc[i];
-        char b = enc[i + 1];
-        char c = enc[i + 2];
-        // Append decoded result to dec
-   strcat(dec, decode(a, b, c));
-    }
-    printf("Decoded message : %s\n", dec);
-    return 0;
+}
+
+int main() {
+    const char *key = "KEY"; // Replace with your desired key
+    char message[100] ; // Replace with your message
+    printf("Enter the message:");
+    scanf("%[^\n]",message);
+    // Encrypt the message
+    vigenereEncrypt(message, key);
+    printf("Encrypted Message: %s\n", message);
+    // Decrypt the message back to the original
+    vigenereDecrypt(message, key);
+    printf("Decrypted Message: %s\n", message);
+   return 0;
 }
 
 ```
-
 ## OUTPUT:
 
-Simulating Hill Cipher
+Simulating Vigenere Cipher
 
-![image](https://github.com/user-attachments/assets/143555b4-f967-48ef-aa86-4c64b4ec961b)
+![image](https://github.com/user-attachments/assets/509bcaca-3e8c-4025-9788-d92e09e7ed57)
 
 ## RESULT:
 The program is executed successfully
 
--------------------------------------------------
+-----------------------------------------------------------------------
 
